@@ -19,6 +19,9 @@ export default function VerifyScreen() {
   const [faceCount, setFaceCount] =
     useState(0);
 
+  const [status, setStatus] =
+    useState('No Face');
+
   const device =
     useCameraDevice('front');
 
@@ -39,7 +42,24 @@ export default function VerifyScreen() {
         device={device}
         isActive={true}
         onFacesDetected={(faces) => {
+
           setFaceCount(faces.length);
+
+          if (faces.length === 0) {
+
+            setStatus('No Face');
+
+          } else if (faces.length > 1) {
+
+            setStatus('Multiple Faces');
+
+          } else {
+
+            setStatus('Face Detected');
+
+            console.log(faces[0]);
+          }
+
         }}
         onError={(error) => {
           console.log(error);
@@ -47,9 +67,15 @@ export default function VerifyScreen() {
       />
 
       <View style={styles.overlay}>
+
+        <Text style={styles.text}>
+          {status}
+        </Text>
+
         <Text style={styles.text}>
           Faces Detected: {faceCount}
         </Text>
+
       </View>
 
     </View>
@@ -80,6 +106,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 24,
     fontWeight: 'bold',
+    marginBottom: 8,
   },
 
 });
