@@ -7,20 +7,22 @@ import {
 } from 'react-native';
 
 import {
-  Camera,
   useCameraDevice,
 } from 'react-native-vision-camera';
 
+import {
+  Camera,
+} from 'react-native-vision-camera-face-detector';
 
 export default function VerifyScreen() {
 
-  const device = useCameraDevice('front');
+  const [faceCount, setFaceCount] =
+    useState(0);
 
-  const [faceCount] = useState(0);
+  const device =
+    useCameraDevice('front');
 
-
-  if (device == null) {
-
+  if (!device) {
     return (
       <View style={styles.center}>
         <Text>Loading Camera...</Text>
@@ -36,14 +38,18 @@ export default function VerifyScreen() {
         style={StyleSheet.absoluteFill}
         device={device}
         isActive={true}
+        onFacesDetected={(faces) => {
+          setFaceCount(faces.length);
+        }}
+        onError={(error) => {
+          console.log(error);
+        }}
       />
 
       <View style={styles.overlay}>
-
         <Text style={styles.text}>
           Faces Detected: {faceCount}
         </Text>
-
       </View>
 
     </View>
@@ -65,15 +71,15 @@ const styles = StyleSheet.create({
   overlay: {
     position: 'absolute',
     top: 60,
-    left: 20,
-    right: 20,
+    left: 0,
+    right: 0,
     alignItems: 'center',
   },
 
   text: {
-    fontSize: 22,
-    fontWeight: 'bold',
     color: 'white',
+    fontSize: 24,
+    fontWeight: 'bold',
   },
 
 });
