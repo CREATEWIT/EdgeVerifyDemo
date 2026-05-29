@@ -15,12 +15,20 @@ import {
 } from 'react-native-vision-camera-face-detector';
 
 export default function VerifyScreen() {
-
+  
   const [faceCount, setFaceCount] =
     useState(0);
 
   const [status, setStatus] =
     useState('No Face');
+
+  const [debugInfo, setDebugInfo] =
+    useState('');
+    const [leftVerified, setLeftVerified] =
+  useState(false);
+
+const [rightVerified, setRightVerified] =
+  useState(false);
 
   const device =
     useCameraDevice('front');
@@ -48,18 +56,82 @@ export default function VerifyScreen() {
           if (faces.length === 0) {
 
             setStatus('No Face');
+            setDebugInfo('');
 
           } else if (faces.length > 1) {
 
             setStatus('Multiple Faces');
 
-          } else {
+          }else {
 
-            setStatus('Face Detected');
+  const face = faces[0];
 
-            console.log(faces[0]);
-          }
+  const yaw = face.yawAngle;
 
+  const {
+    width,
+    x,
+  } = face.bounds;
+
+  setDebugInfo(
+    JSON.stringify(
+      {
+        yaw: face.yawAngle,
+        pitch: face.pitchAngle,
+        roll: face.rollAngle,
+        width,
+        x,
+        leftVerified,
+        rightVerified,
+      },
+      null,
+      2
+    )
+  );
+
+  if (width < 300) {
+
+    setStatus('Move Closer');
+
+  } else if (x < 150) {
+
+    setStatus('Move Right');
+
+  } else if (x > 450) {
+
+    setStatus('Move Left');
+
+  } else {
+
+    if (!leftVerified) {
+
+      if (yaw > 40) {
+
+        setLeftVerified(true);
+
+      }
+
+      setStatus('Turn Head Left');
+
+    } else if (!rightVerified) {
+
+      if (yaw < -40) {
+
+        setRightVerified(true);
+
+      }
+
+      setStatus('Turn Head Right');
+
+    } else {
+
+      setStatus('Liveness Passed ✓');
+
+    }
+
+  }
+
+}
         }}
         onError={(error) => {
           console.log(error);
@@ -74,6 +146,10 @@ export default function VerifyScreen() {
 
         <Text style={styles.text}>
           Faces Detected: {faceCount}
+        </Text>
+
+        <Text style={styles.debugText}>
+          {debugInfo}
         </Text>
 
       </View>
@@ -97,16 +173,24 @@ const styles = StyleSheet.create({
   overlay: {
     position: 'absolute',
     top: 60,
-    left: 0,
-    right: 0,
+    left: 10,
+    right: 10,
     alignItems: 'center',
   },
 
   text: {
     color: 'white',
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 8,
+  },
+
+  debugText: {
+    color: 'yellow',
+    fontSize: 12,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    padding: 8,
+    maxHeight: 300,
   },
 
 });
