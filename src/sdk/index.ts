@@ -1,0 +1,1 @@
+export { verifyFace } from './verification/verifyFace';
