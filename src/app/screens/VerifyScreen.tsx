@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import {
+  Camera,
+} from 'react-native-vision-camera-face-detector';
 
 import {
   View,
@@ -10,26 +13,20 @@ import {
   useCameraDevice,
 } from 'react-native-vision-camera';
 
-import {
-  Camera,
-} from 'react-native-vision-camera-face-detector';
 
 export default function VerifyScreen() {
   
   const [faceCount, setFaceCount] =
     useState(0);
+    
 
   const [status, setStatus] =
     useState('No Face');
 
   const [debugInfo, setDebugInfo] =
     useState('');
-    const [leftVerified, setLeftVerified] =
-  useState(false);
-
-const [rightVerified, setRightVerified] =
-  useState(false);
-
+  const [step, setStep] =
+  useState('BLINK');
   const device =
     useCameraDevice('front');
 
@@ -40,16 +37,16 @@ const [rightVerified, setRightVerified] =
       </View>
     );
   }
-
   return (
 
     <View style={styles.container}>
 
       <Camera
-        style={StyleSheet.absoluteFill}
-        device={device}
-        isActive={true}
-        onFacesDetected={(faces) => {
+          style={StyleSheet.absoluteFill}
+  device={device}
+  isActive={true}
+  runClassifications={true}
+  onFacesDetected={(faces) => {
 
           setFaceCount(faces.length);
 
@@ -57,7 +54,7 @@ const [rightVerified, setRightVerified] =
 
             setStatus('No Face');
             setDebugInfo('');
-
+             setStep('BLINK');
           } else if (faces.length > 1) {
 
             setStatus('Multiple Faces');
@@ -65,71 +62,110 @@ const [rightVerified, setRightVerified] =
           }else {
 
   const face = faces[0];
+if (step === 'BLINK') {
 
-  const yaw = face.yawAngle;
+  setStatus('Blink Both Eyes');
 
-  const {
-    width,
-    x,
-  } = face.bounds;
-
-  setDebugInfo(
-    JSON.stringify(
-      {
-        yaw: face.yawAngle,
-        pitch: face.pitchAngle,
-        roll: face.rollAngle,
-        width,
-        x,
-        leftVerified,
-        rightVerified,
-      },
-      null,
-      2
-    )
-  );
-
-  if (width < 300) {
-
-    setStatus('Move Closer');
-
-  } else if (x < 150) {
-
-    setStatus('Move Right');
-
-  } else if (x > 450) {
-
-    setStatus('Move Left');
-
-  } else {
-
-    if (!leftVerified) {
-
-      if (yaw > 40) {
-
-        setLeftVerified(true);
-
-      }
-
-      setStatus('Turn Head Left');
-
-    } else if (!rightVerified) {
-
-      if (yaw < -40) {
-
-        setRightVerified(true);
-
-      }
-
-      setStatus('Turn Head Right');
-
-    } else {
-
-      setStatus('Liveness Passed ✓');
-
-    }
-
+  if (
+  (face.leftEyeOpenProbability ?? 1) < 0.2 &&
+  (face.rightEyeOpenProbability ?? 1) < 0.2
+) {
+    setStep('SMILE');
   }
+
+} else if (step === 'SMILE') {
+
+  setStatus('Smile');
+
+  if (
+  (face.smilingProbability ?? 0) > 0.8
+) {
+    setStep('LEFT');
+  }
+
+} else if (step === 'LEFT') {
+
+  setStatus('Turn Head Left');
+
+  if (
+  face.yawAngle < -40
+) {
+    setStep('RIGHT');
+  }
+
+} else if (step === 'LEFT') {
+
+  setStatus('Turn Head Left');
+
+  if (
+    face.yawAngle < -40
+  ) {
+    setStep('CENTER');
+  }
+
+} else if (step === 'CENTER') {
+
+  setStatus('Look Straight');
+
+  if (
+    face.yawAngle > -10 &&
+    face.yawAngle < 10
+  ) {
+    setStep('RIGHT');
+  }
+
+} else if (step === 'RIGHT') {
+
+  setStatus('Turn Head Right');
+
+  if (
+    face.yawAngle > 40
+  ) {
+    setStep('VERIFIED');
+  }
+
+} else {
+
+  setStatus('Liveness Passed ✓');
+
+}
+  const { width, x } = face.bounds;
+
+if (width < 300) {
+  setStatus('Move Closer');
+  return;
+}
+
+ setDebugInfo( JSON.stringify({
+  step,
+
+  leftEye:
+    face.leftEyeOpenProbability,
+
+  rightEye:
+    face.rightEyeOpenProbability,
+
+  smile:
+    face.smilingProbability,
+
+  yaw:
+    face.yawAngle,
+
+  pitch:
+    face.pitchAngle,
+
+  roll:
+    face.rollAngle,
+
+  width,
+  x,
+},
+    null,
+    2
+  )
+);
+
+  
 
 }
         }}
@@ -137,7 +173,6 @@ const [rightVerified, setRightVerified] =
           console.log(error);
         }}
       />
-
       <View style={styles.overlay}>
 
         <Text style={styles.text}>
@@ -145,8 +180,12 @@ const [rightVerified, setRightVerified] =
         </Text>
 
         <Text style={styles.text}>
-          Faces Detected: {faceCount}
-        </Text>
+  Faces Detected: {faceCount}
+</Text>
+
+<Text style={styles.text}>
+  Step: {step}
+</Text>
 
         <Text style={styles.debugText}>
           {debugInfo}
