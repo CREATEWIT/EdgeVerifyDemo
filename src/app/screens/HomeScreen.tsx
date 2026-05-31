@@ -20,17 +20,32 @@ HomeScreen({
       </Text>
 
       <TouchableOpacity
-        onPress={() =>
-          navigation.navigate(
-            'Verify'
-          )
-        }>
+  onPress={() =>
+    navigation.navigate(
+      'Verify',
+      {
+        mode: 'verify',
+      }
+    )
+  }>
 
         <Text>
           Start Verification
         </Text>
 
       </TouchableOpacity>
+      <TouchableOpacity
+  onPress={() =>
+    navigation.navigate(
+      'Register'
+    )
+  }>
+
+  <Text>
+    Register Employee
+  </Text>
+
+</TouchableOpacity>
 
     </View>
   );

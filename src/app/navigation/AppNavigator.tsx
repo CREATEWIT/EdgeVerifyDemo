@@ -13,6 +13,8 @@ from '../screens/VerifyScreen';
 
 import ResultScreen
 from '../screens/ResultScreen';
+import RegisterScreen from '../screens/RegisterScreen';
+import CapturePhotoScreen from '../screens/CapturePhotoScreen';
 
 const Stack =
   createNativeStackNavigator();
@@ -40,7 +42,14 @@ AppNavigator() {
           name="Result"
           component={ResultScreen}
         />
-
+         <Stack.Screen
+  name="Register"
+  component={RegisterScreen}
+/>
+<Stack.Screen
+  name="CapturePhoto"
+  component={CapturePhotoScreen}
+/>
       </Stack.Navigator>
 
     </NavigationContainer>
