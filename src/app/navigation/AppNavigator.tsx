@@ -1,4 +1,6 @@
 import React from 'react';
+import EmployeeListScreen
+from '../screens/EmployeeListScreen';
 
 import {
   NavigationContainer,
@@ -65,7 +67,10 @@ export default function AppNavigator() {
             title: 'Verification Result',
           }}
         />
-
+        <Stack.Screen
+  name="Employees"
+  component={EmployeeListScreen}
+/>
       </Stack.Navigator>
 
     </NavigationContainer>

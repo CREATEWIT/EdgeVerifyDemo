@@ -1,6 +1,4 @@
-import React, {
-  useState,
-} from 'react';
+import React from 'react';
 
 import {
   View,
@@ -8,18 +6,10 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
-import {
-  getEmployees,
-} from '../../storage/employeeStorage';
-
 export default function
 HomeScreen({
   navigation,
 }: any) {
-
-  const [employeesText,
-  setEmployeesText] =
-    useState('');
 
   return (
 
@@ -39,11 +29,9 @@ HomeScreen({
           )
         }
       >
-
         <Text>
           Start Verification
         </Text>
-
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -53,39 +41,22 @@ HomeScreen({
           )
         }
       >
-
         <Text>
           Register Employee
         </Text>
-
       </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={async () => {
-
-          const employees =
-            await getEmployees();
-
-          setEmployeesText(
-            JSON.stringify(
-              employees,
-              null,
-              2
-            )
-          );
-
-        }}
+        onPress={() =>
+          navigation.navigate(
+            'Employees'
+          )
+        }
       >
-
         <Text>
-          Show Employees
+          View Employees
         </Text>
-
       </TouchableOpacity>
-
-      <Text>
-        {employeesText}
-      </Text>
 
     </View>
   );

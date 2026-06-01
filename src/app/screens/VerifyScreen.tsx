@@ -2,6 +2,9 @@ import React, { useState, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Camera } from 'react-native-vision-camera-face-detector';
 import { useCameraDevice, usePhotoOutput } from 'react-native-vision-camera';
+import {
+  saveVerification,
+} from '../../storage/verificationStorage';
 
 type LivenessStep = 'BLINK' | 'SMILE' | 'LEFT' | 'CENTER' | 'RIGHT' | 'VERIFIED';
 
@@ -17,6 +20,8 @@ export default function VerifyScreen({ route,navigation, }: any) {
 
   const stepRef = useRef<LivenessStep>('BLINK');
   const photoCapturedRef = useRef(false);
+  const verificationSavedRef =
+  useRef(false);
 
   const photoOutput = usePhotoOutput();
   const device = useCameraDevice('front');
@@ -86,7 +91,7 @@ const captureFace = useCallback(async () => {
 
   // ─── Liveness State Machine ──────────────────────────────────────────────────
 
-  const handleLivenessStep = useCallback((face: any) => {
+ const handleLivenessStep = useCallback(async (face: any) => {
     switch (stepRef.current) {
       case 'BLINK':
         setStatus('Blink Both Eyes');
@@ -134,7 +139,24 @@ const captureFace = useCallback(async () => {
 
   break;
 
-   case 'VERIFIED':
+  case 'VERIFIED':
+
+  if (
+    !verificationSavedRef.current
+  ) {
+
+    verificationSavedRef.current =
+      true;
+
+    await saveVerification({
+      employeeId,
+      employeeName,
+      verifiedAt:
+        new Date().toISOString(),
+      livenessPassed: true,
+    });
+
+  }
 
   setStatus(
     'Liveness Passed ✓'
@@ -170,6 +192,8 @@ const captureFace = useCallback(async () => {
       setDebugInfo('');
       updateStep('BLINK');
       photoCapturedRef.current = false;
+      verificationSavedRef.current =
+  false;
       return;
     }
 
@@ -186,7 +210,15 @@ const captureFace = useCallback(async () => {
       return;
     }
 
-    handleLivenessStep(face);
+    handleLivenessStep(face)
+  .catch(error => {
+
+    console.log(
+      'LIVENESS_ERROR',
+      error
+    );
+
+  });
 
     setDebugInfo(
       JSON.stringify({

@@ -3,6 +3,6 @@
   "compilerOptions": {
     "types": ["jest"]
   },
-  "include": ["**/*.ts", "**/*.tsx"],
+  "include": ["**/*.ts", "**/*.tsx", "src/assets/models/mobilefacenet.tflite"],
   "exclude": ["**/node_modules", "**/Pods"]
 }

@@ -6,13 +6,31 @@ export interface Employee {
   employeeId: string;
   employeeName: string;
   registeredAt: string;
+  photoWidth: number;
+  photoHeight: number;
 }
 
 export async function saveEmployee(
   employee: Employee,
 ) {
+
   const employees =
     await getEmployees();
+
+  const existingEmployee =
+    employees.find(
+      e =>
+        e.employeeId ===
+        employee.employeeId
+    );
+
+  if (existingEmployee) {
+
+    throw new Error(
+      'Employee ID already exists'
+    );
+
+  }
 
   employees.push(employee);
 

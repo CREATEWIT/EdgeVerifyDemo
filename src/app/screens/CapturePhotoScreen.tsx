@@ -76,22 +76,34 @@ const photo =
     {},
     {}
   );
-  await saveEmployee({
+  try {
+
+await saveEmployee({
   employeeId,
   employeeName,
   registeredAt:
     new Date().toISOString(),
+  photoWidth:
+    photo.width,
+  photoHeight:
+    photo.height,
 });
 
-const p: any = photo;
+  setMessage(
+    'EMPLOYEE_REGISTERED ✓'
+  );
 
-setMessage(
-  'EMPLOYEE_REGISTERED'
-);
+} catch (error) {
+
+  setMessage(
+    String(error)
+  );
+
+}
 
 console.log(
   'PHOTO_OBJECT',
-  p
+  photo
 );
 
 } catch (error) {
