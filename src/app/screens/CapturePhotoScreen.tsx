@@ -16,6 +16,9 @@ import {
 import {
   TouchableOpacity,
 } from 'react-native';
+import {
+  saveEmployee,
+} from '../../storage/employeeStorage';
 
 export default function CapturePhotoScreen({
   route,
@@ -73,19 +76,17 @@ const photo =
     {},
     {}
   );
+  await saveEmployee({
+  employeeId,
+  employeeName,
+  registeredAt:
+    new Date().toISOString(),
+});
 
 const p: any = photo;
 
 setMessage(
-  JSON.stringify(
-    {
-      width: p.width,
-      height: p.height,
-      type: p.__type,
-    },
-    null,
-    2
-  )
+  'EMPLOYEE_REGISTERED'
 );
 
 console.log(
