@@ -3,9 +3,6 @@ import {
   loadFaceModel,
 } from '../../sdk/matching/loadModel';
 import {
-  generateEmbedding,
-} from '../../sdk/matching/generateEmbedding';
-import {
   View,
   Text,
   TouchableOpacity,
@@ -110,15 +107,8 @@ setModelStatus(
 
     try {
 
-      const result =
-  await generateEmbedding();
-
-setModelStatus(
-  JSON.stringify(
-    result,
-    null,
-    2
-  )
+     setModelStatus(
+  'USE CAPTURE SCREEN'
 );
 
     } catch (error) {

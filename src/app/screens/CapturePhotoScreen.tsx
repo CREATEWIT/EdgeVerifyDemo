@@ -4,6 +4,9 @@ import {
   Text,
   StyleSheet,
 } from 'react-native';
+import {
+  testPixelBuffer,
+} from '../../sdk/matching/testPixelBuffer';
 import React, {
   useState,
 } from 'react';
@@ -16,9 +19,6 @@ import {
 import {
   TouchableOpacity,
 } from 'react-native';
-import {
-  saveEmployee,
-} from '../../storage/employeeStorage';
 
 export default function CapturePhotoScreen({
   route,
@@ -76,8 +76,26 @@ const photo =
     {},
     {}
   );
-  try {
 
+console.log(
+  'HAS_PIXEL_BUFFER',
+  photo.hasPixelBuffer
+);
+
+const result =
+  await testPixelBuffer(
+    photo
+  );
+
+setMessage(
+  JSON.stringify(
+    result,
+    null,
+    2
+  )
+);
+
+/*
 await saveEmployee({
   employeeId,
   employeeName,
@@ -89,29 +107,23 @@ await saveEmployee({
     photo.height,
 });
 
-  setMessage(
-    'EMPLOYEE_REGISTERED ✓'
-  );
-
-} catch (error) {
-
-  setMessage(
-    String(error)
-  );
-
-}
+setMessage(
+  'EMPLOYEE_REGISTERED ✓'
+);
+*/} catch (error) {
 
 console.log(
-  'PHOTO_OBJECT',
-  photo
+  'FULL_ERROR',
+  error
 );
 
-} catch (error) {
-
-  setMessage(
-    'ERROR: ' +
-    String(error)
-  );
+setMessage(
+  JSON.stringify(
+    error,
+    null,
+    2
+  )
+);
 
 }
 

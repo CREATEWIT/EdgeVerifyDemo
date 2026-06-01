@@ -3,37 +3,38 @@ import {
 } from './loadModel';
 
 export async function
-generateEmbedding() {
+generateEmbedding(
+  _pixelBuffer: ArrayBuffer,
+) {
 
-  const model =
-    await loadFaceModel();
+ console.log(
+  'STEP_1_MODEL_LOADING'
+);
 
-  const input =
-    new Float32Array(
-      1 * 112 * 112 * 3
-    ).buffer;
+const model =
+  await loadFaceModel();
 
-  const output =
-    await model.run([
-      input,
-    ]);
+console.log(
+  'STEP_2_MODEL_LOADED'
+);
 
-  const firstOutput =
-    output[0] as any;
+const input =
+  new Float32Array(
+    1 * 112 * 112 * 3
+  );
 
-  return {
-    constructor:
-      firstOutput?.constructor?.name,
+console.log(
+  'STEP_3_INPUT_CREATED'
+);
 
-    byteLength:
-      firstOutput?.byteLength,
+const output =
+  await model.run([
+    input.buffer,
+  ]);
 
-    length:
-      firstOutput?.length,
+console.log(
+  'STEP_4_MODEL_FINISHED'
+);
 
-    keys:
-      Object.keys(
-        firstOutput || {}
-      ),
-  };
+return output;
 }

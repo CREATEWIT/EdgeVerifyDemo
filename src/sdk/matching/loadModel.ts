@@ -2,9 +2,15 @@ import {
   loadTensorflowModel,
 } from 'react-native-fast-tflite';
 
+let cachedModel: any = null;
+
 export async function loadFaceModel() {
 
-  const model =
+  if (cachedModel) {
+    return cachedModel;
+  }
+
+  cachedModel =
     await loadTensorflowModel(
       require(
         '../../../assets/models/mobilefacenet.tflite'
@@ -12,5 +18,5 @@ export async function loadFaceModel() {
       []
     );
 
-  return model;
+  return cachedModel;
 }
