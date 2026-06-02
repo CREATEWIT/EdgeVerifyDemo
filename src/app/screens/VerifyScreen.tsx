@@ -2,13 +2,14 @@ import React, { useState, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Camera } from 'react-native-vision-camera-face-detector';
 import { useCameraDevice, usePhotoOutput } from 'react-native-vision-camera';
-import {
-  saveVerification,
-} from '../../storage/verificationStorage';
+import { saveVerification } from '../../storage/verificationStorage';
 
 type LivenessStep = 'BLINK' | 'SMILE' | 'LEFT' | 'CENTER' | 'RIGHT' | 'VERIFIED';
 
-export default function VerifyScreen({ route,navigation, }: any) {
+// How long (ms) the user must hold CENTER gaze before moving to RIGHT
+const CENTER_HOLD_MS = 1500;
+
+export default function VerifyScreen({ route, navigation }: any) {
   const mode = route?.params?.mode;
   const employeeId = route?.params?.employeeId;
   const employeeName = route?.params?.employeeName;
@@ -18,12 +19,13 @@ export default function VerifyScreen({ route,navigation, }: any) {
   const [debugInfo, setDebugInfo] = useState('');
   const [stepUi, setStepUi] = useState<LivenessStep>('BLINK');
 
+
   const stepRef = useRef<LivenessStep>('BLINK');
   const photoCapturedRef = useRef(false);
-  const verificationSavedRef =
-  useRef(false);
+  const verificationSavedRef = useRef(false);
 
-  const photoOutput = usePhotoOutput();
+  // Tracks when user first hit CENTER so we can enforce hold time
+  const centerStartRef = useRef<number | null>(null);
   const device = useCameraDevice('front');
 
   const updateStep = (s: LivenessStep) => {
@@ -31,68 +33,17 @@ export default function VerifyScreen({ route,navigation, }: any) {
     setStepUi(s);
   };
 
-  // ─── Capture ─────────────────────────────────────────────────────────────────
-const captureFace = useCallback(async () => {
+  // ─── Liveness State Machine ───────────────────────────────────────────────────
+  const handleLivenessStep = useCallback(async (face: any) => {
 
-  setStatus('CAPTURE_STARTED');
+    // ── yawAngle on front camera is mirrored ──────────────────────────────────
+    // Physical LEFT turn  → positive yaw  (mirrored)
+    // Physical RIGHT turn → negative yaw  (mirrored)
+    const yaw: number = face.yawAngle ?? 0;
 
-  console.log(
-    'CAPTURE_FUNCTION_STARTED'
-  );
-
-  try {
-
-    const photo =
-      await photoOutput.capturePhotoToFile(
-        {},
-        {}
-      );
-
-    console.log(
-      'PHOTO_FILE',
-      photo
-    );
-
-    setDebugInfo(
-      JSON.stringify(
-        photo,
-        null,
-        2
-      )
-    );
-
-    setStatus(
-      'PHOTO_CAPTURED ✓'
-    );
-
-  } catch (error) {
-
-    console.log(
-      'CAPTURE_ERROR',
-      error
-    );
-
-    const message =
-      error instanceof Error
-        ? error.message
-        : String(error);
-
-    setDebugInfo(
-      'ERROR: ' + message
-    );
-
-    setStatus(
-      'CAPTURE_ERROR'
-    );
-
-  }
-
-}, [photoOutput]);
-
-  // ─── Liveness State Machine ──────────────────────────────────────────────────
-
- const handleLivenessStep = useCallback(async (face: any) => {
     switch (stepRef.current) {
+
+      // ── BLINK ──────────────────────────────────────────────────────────────
       case 'BLINK':
         setStatus('Blink Both Eyes');
         if (
@@ -103,87 +54,97 @@ const captureFace = useCallback(async () => {
         }
         break;
 
+      // ── SMILE ──────────────────────────────────────────────────────────────
       case 'SMILE':
-        setStatus('Smile');
+        setStatus('Smile 😊');
         if ((face.smilingProbability ?? 0) > 0.8) {
           updateStep('LEFT');
         }
         break;
 
+      // ── LEFT ───────────────────────────────────────────────────────────────
+      // Front camera: user turns LEFT  → yaw becomes POSITIVE (mirrored)
       case 'LEFT':
-        setStatus('Turn Head Left');
-        if (face.yawAngle < -40) {
+        setStatus('Turn Head Left ←');
+        if (yaw > 40) {           // mirrored: positive = physical left
           updateStep('CENTER');
+          centerStartRef.current = null; // reset hold timer
         }
         break;
 
-      case 'CENTER':
-        setStatus('Look Straight');
-        if (face.yawAngle > -10 && face.yawAngle < 10) {
-          updateStep('RIGHT');
+      // ── CENTER ─────────────────────────────────────────────────────────────
+      // Must stay centered for CENTER_HOLD_MS before advancing
+      case 'CENTER': {
+        const isCentered = yaw > -15 && yaw < 15;
+
+        if (isCentered) {
+          setStatus('Look Straight ⏳');
+          if (centerStartRef.current === null) {
+            centerStartRef.current = Date.now();
+          }
+          const held = Date.now() - centerStartRef.current;
+          if (held >= CENTER_HOLD_MS) {
+            updateStep('RIGHT');
+            centerStartRef.current = null;
+          }
+        } else {
+          // Drifted away — reset the hold timer
+          centerStartRef.current = null;
+          setStatus('Look Straight →');
         }
         break;
+      }
 
+      // ── RIGHT ──────────────────────────────────────────────────────────────
+      // Front camera: user turns RIGHT → yaw becomes NEGATIVE (mirrored)
       case 'RIGHT':
+        setStatus('Turn Head Right →');
+        if (yaw < -40) {          // mirrored: negative = physical right
+          updateStep('VERIFIED');
+        }
+        break;
 
-  setStatus('RIGHT_SUCCESS');
+      // ── VERIFIED ───────────────────────────────────────────────────────────
+      case 'VERIFIED':
+        if (!verificationSavedRef.current) {
+          verificationSavedRef.current = true;
+          await saveVerification({
+            employeeId,
+            employeeName,
+            verifiedAt: new Date().toISOString(),
+            livenessPassed: true,
+          });
+        }
 
-  if (face.yawAngle > 40) {
+        setStatus('Liveness Passed ✓');
 
-    console.log(
-      'RIGHT_COMPLETED'
-    );
+        if (mode === 'enroll' && !photoCapturedRef.current) {
+          photoCapturedRef.current = true;
+          navigation.navigate('CapturePhoto', { employeeId, employeeName });
+        }
 
-    updateStep('VERIFIED');
-  }
+      if (
+  mode === 'verify' &&
+  !photoCapturedRef.current
+) {
 
-  break;
+  photoCapturedRef.current =
+    true;
 
-  case 'VERIFIED':
-
-  if (
-    !verificationSavedRef.current
-  ) {
-
-    verificationSavedRef.current =
-      true;
-
-    await saveVerification({
+  navigation.navigate(
+    'CapturePhoto',
+    {
+      mode: 'verify',
       employeeId,
-      employeeName,
-      verifiedAt:
-        new Date().toISOString(),
-      livenessPassed: true,
-    });
-
-  }
-
-  setStatus(
-    'Liveness Passed ✓'
+    }
   );
 
-  if (
-    mode === 'enroll' &&
-    !photoCapturedRef.current
-  ) {
-
-    photoCapturedRef.current = true;
-
-    navigation.navigate(
-      'CapturePhoto',
-      {
-        employeeId,
-        employeeName,
-      }
-    );
-  }
-
-  break;
+}
+        break;
     }
-  }, [mode,employeeId, employeeName, navigation]);
+  }, [mode, employeeId, employeeName, navigation,]);
 
-  // ─── Face Detection ───────────────────────────────────────────────────────────
-
+  // ─── Face Detection ────────────────────────────────────────────────────────────
   const handleFacesDetected = useCallback((faces: any[]) => {
     setFaceCount(faces.length);
 
@@ -192,33 +153,35 @@ const captureFace = useCallback(async () => {
       setDebugInfo('');
       updateStep('BLINK');
       photoCapturedRef.current = false;
-      verificationSavedRef.current =
-  false;
+      verificationSavedRef.current = false;
+      centerStartRef.current = null;
       return;
     }
 
     if (faces.length > 1) {
-      setStatus('Multiple Faces');
+      setStatus('Multiple Faces Detected');
       return;
     }
 
     const face = faces[0];
-    const { width } = face.bounds;
 
-    if (width < 220) {
-      setStatus('Move Closer');
+    // ── FIX: bounds comes as { x, y, width, height } or as a flat object ──────
+    // Try both shapes defensively
+    const faceWidth: number =
+      face.bounds?.width ??   // react-native-vision-camera-face-detector v3
+      face.width ??            // some older versions
+      face.frameWidth ??       // fallback
+      0;
+
+    if (faceWidth > 0 && faceWidth < 320) {
+      setStatus('Move Closer 🔍');
+      setDebugInfo(JSON.stringify({ faceWidth }, null, 2));
       return;
     }
 
-    handleLivenessStep(face)
-  .catch(error => {
-
-    console.log(
-      'LIVENESS_ERROR',
-      error
-    );
-
-  });
+    handleLivenessStep(face).catch(err => {
+      console.log('LIVENESS_ERROR', err);
+    });
 
     setDebugInfo(
       JSON.stringify({
@@ -226,16 +189,15 @@ const captureFace = useCallback(async () => {
         leftEye: face.leftEyeOpenProbability?.toFixed(2),
         rightEye: face.rightEyeOpenProbability?.toFixed(2),
         smile: face.smilingProbability?.toFixed(2),
-        yaw: Math.round(face.yawAngle),
-        pitch: Math.round(face.pitchAngle),
-        roll: Math.round(face.rollAngle),
-        width: Math.round(width),
+        yaw: Math.round(face.yawAngle ?? 0),
+        pitch: Math.round(face.pitchAngle ?? 0),
+        roll: Math.round(face.rollAngle ?? 0),
+        faceWidth: Math.round(faceWidth),
       }, null, 2)
     );
   }, [handleLivenessStep]);
 
-  // ─── Render ───────────────────────────────────────────────────────────────────
-
+  // ─── Render ────────────────────────────────────────────────────────────────────
   if (!device) {
     return (
       <View style={styles.center}>
@@ -249,7 +211,6 @@ const captureFace = useCallback(async () => {
       <Camera
         style={StyleSheet.absoluteFill}
         device={device}
-        outputs={[photoOutput]}
         isActive={true}
         runClassifications={true}
         onFacesDetected={handleFacesDetected}
@@ -269,8 +230,7 @@ const captureFace = useCallback(async () => {
   );
 }
 
-// ─── Styles ──────────────────────────────────────────────────────────────────────
-
+// ─── Styles ────────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
