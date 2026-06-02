@@ -87,7 +87,10 @@ EmployeeListScreen() {
   Height:
   {item.photoHeight}
 </Text>
-
+        <Text>
+  Embedding Length:
+  {item.embedding?.length}
+</Text>
           </View>
 
         )}
