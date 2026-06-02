@@ -36,5 +36,25 @@ console.log(
   'STEP_4_MODEL_FINISHED'
 );
 
-return output;
+const embeddingBuffer =
+  output[0];
+
+const embedding =
+  Array.from(
+    new Float32Array(
+      embeddingBuffer
+    )
+  );
+
+console.log(
+  'EMBEDDING_LENGTH',
+  embedding.length
+);
+
+console.log(
+  'FIRST_10_VALUES',
+  embedding.slice(0, 10)
+);
+
+return embedding;
 }

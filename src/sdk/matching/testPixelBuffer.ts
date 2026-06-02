@@ -29,16 +29,14 @@ testPixelBuffer(
   );
 
   return {
-    embeddingType:
-      typeof embedding,
-
-    isArray:
-      Array.isArray(
-        embedding
-      ),
-
     length:
       embedding.length,
+
+    firstFive:
+      embedding.slice(
+        0,
+        5
+      ),
   };
 
 }
