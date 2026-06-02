@@ -5,8 +5,12 @@ import {
   StyleSheet,
 } from 'react-native';
 import {
-  testPixelBuffer,
-} from '../../sdk/matching/testPixelBuffer';
+  generateEmbedding,
+} from '../../sdk/matching/generateEmbedding';
+
+import {
+  saveEmployee,
+} from '../../storage/employeeStorage';
 import React, {
   useState,
 } from 'react';
@@ -82,17 +86,40 @@ console.log(
   photo.hasPixelBuffer
 );
 
-const result =
-  await testPixelBuffer(
-    photo
+const pixelBuffer =
+  photo.getPixelBuffer();
+
+const embedding =
+  await generateEmbedding(
+    pixelBuffer
   );
 
+console.log(
+  'EMBEDDING_GENERATED'
+);
+
+console.log(
+  'BEFORE_SAVE'
+);
+
+await saveEmployee({
+  employeeId,
+  employeeName,
+  registeredAt:
+    new Date().toISOString(),
+  photoWidth:
+    photo.width,
+  photoHeight:
+    photo.height,
+  embedding,
+});
+
+console.log(
+  'AFTER_SAVE'
+);
+
 setMessage(
-  JSON.stringify(
-    result,
-    null,
-    2
-  )
+  'EMPLOYEE_REGISTERED ✓'
 );
 
 /*
@@ -112,22 +139,20 @@ setMessage(
 );
 */} catch (error) {
 
-console.log(
-  'FULL_ERROR',
-  error
-);
+  console.log(
+    'SAVE_ERROR',
+    error
+  );
 
-setMessage(
-  JSON.stringify(
-    error,
-    null,
-    2
-  )
-);
+  setMessage(
+    String(error)
+  );
 
 }
 
-}}
+}
+
+}
 >
   <Text style={styles.buttonText}>
     PRESS ME

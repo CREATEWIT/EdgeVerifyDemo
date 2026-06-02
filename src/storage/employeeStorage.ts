@@ -8,6 +8,7 @@ export interface Employee {
   registeredAt: string;
   photoWidth: number;
   photoHeight: number;
+  embedding: number[];
 }
 
 export async function saveEmployee(
