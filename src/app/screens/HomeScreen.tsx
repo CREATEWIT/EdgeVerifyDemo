@@ -26,12 +26,9 @@ setModelStatus] =
 
       <TouchableOpacity
         onPress={() =>
-          navigation.navigate(
-            'Verify',
-            {
-              mode: 'verify',
-            }
-          )
+         navigation.navigate(
+  'VerifyEmployee'
+)
         }
       >
         <Text>

@@ -52,3 +52,18 @@ export async function getEmployees(): Promise<Employee[]> {
     ? JSON.parse(data)
     : [];
 }
+
+export async function getEmployeeById(
+  employeeId: string,
+) {
+
+  const employees =
+    await getEmployees();
+
+  return employees.find(
+    e =>
+      e.employeeId ===
+      employeeId
+  );
+
+}

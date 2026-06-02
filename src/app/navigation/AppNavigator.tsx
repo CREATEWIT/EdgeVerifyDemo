@@ -1,7 +1,8 @@
 import React from 'react';
 import EmployeeListScreen
 from '../screens/EmployeeListScreen';
-
+import VerifyEmployeeScreen
+from '../screens/VerifyEmployeeScreen';
 import {
   NavigationContainer,
 } from '@react-navigation/native';
@@ -43,7 +44,12 @@ export default function AppNavigator() {
             title: 'Register Employee',
           }}
         />
-
+           <Stack.Screen
+  name="VerifyEmployee"
+  component={
+    VerifyEmployeeScreen
+  }
+/>
         <Stack.Screen
           name="Verify"
           component={VerifyScreen}
