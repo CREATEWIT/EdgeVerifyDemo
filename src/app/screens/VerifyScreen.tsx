@@ -57,7 +57,7 @@ export default function VerifyScreen({ route, navigation }: any) {
       // ── SMILE ──────────────────────────────────────────────────────────────
       case 'SMILE':
         setStatus('Smile 😊');
-        if ((face.smilingProbability ?? 0) > 0.8) {
+        if ((face.smilingProbability ?? 0) > .7) {
           updateStep('LEFT');
         }
         break;
@@ -117,12 +117,24 @@ export default function VerifyScreen({ route, navigation }: any) {
         }
 
         setStatus('Liveness Passed ✓');
+if (
+  mode === 'register' &&
+  !photoCapturedRef.current
+) {
 
-        if (mode === 'enroll' && !photoCapturedRef.current) {
-          photoCapturedRef.current = true;
-          navigation.navigate('CapturePhoto', { employeeId, employeeName });
-        }
+  photoCapturedRef.current =
+    true;
 
+  navigation.navigate(
+    'CapturePhoto',
+    {
+      mode: 'register',
+      employeeId,
+      employeeName,
+    }
+  );
+
+}
       if (
   mode === 'verify' &&
   !photoCapturedRef.current

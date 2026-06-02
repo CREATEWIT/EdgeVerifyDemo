@@ -103,6 +103,37 @@ console.log(
 const pixelBuffer =
   photo.getPixelBuffer();
 
+console.log(
+  'PIXEL_BUFFER_BYTES',
+  pixelBuffer.byteLength
+);
+
+const bytes =
+  new Uint8Array(
+    pixelBuffer
+  );
+
+console.log(
+  'FIRST_20_BYTES',
+  Array.from(
+    bytes.slice(0, 20)
+  )
+);
+
+console.log(
+  'PIXEL_BUFFER_TYPE',
+  typeof pixelBuffer
+);
+
+console.log(
+  'PIXEL_BUFFER_CONSTRUCTOR',
+  pixelBuffer?.constructor?.name
+);
+
+console.log(
+  'PIXEL_BUFFER_KEYS',
+  Object.keys(pixelBuffer || {})
+);
 const embedding =
   await generateEmbedding(
     pixelBuffer
@@ -119,7 +150,10 @@ if (
   console.log(
     'BEFORE_SAVE'
   );
-
+console.log(
+  'PIXEL_BUFFER',
+  pixelBuffer
+);
   await saveEmployee({
     employeeId,
     employeeName,

@@ -23,7 +23,7 @@ export default function RegisterScreen({
 
  const onCaptureFace = () => {
   navigation.navigate('Verify', {
-  mode: 'enroll',
+  mode: 'register',
   employeeId,
   employeeName,
 });
