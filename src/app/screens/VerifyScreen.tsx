@@ -1,13 +1,13 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Camera } from 'react-native-vision-camera-face-detector';
-import { useCameraDevice, usePhotoOutput } from 'react-native-vision-camera';
+import { useCameraDevice} from 'react-native-vision-camera';
 import { saveVerification } from '../../storage/verificationStorage';
 
 type LivenessStep = 'BLINK' | 'SMILE' | 'LEFT' | 'CENTER' | 'RIGHT' | 'VERIFIED';
 
 // How long (ms) the user must hold CENTER gaze before moving to RIGHT
-const CENTER_HOLD_MS = 1500;
+const CENTER_HOLD_MS = 1000;
 
 export default function VerifyScreen({ route, navigation }: any) {
   const mode = route?.params?.mode;

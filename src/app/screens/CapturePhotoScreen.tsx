@@ -7,6 +7,13 @@ import {
 import {
   generateEmbedding,
 } from '../../sdk/matching/generateEmbedding';
+import {
+  getEmployeeById,
+} from '../../storage/employeeStorage';
+
+import {
+  compareEmbeddings,
+} from '../../sdk/matching/compareEmbeddings';
 
 import {
   saveEmployee,
@@ -32,6 +39,13 @@ export default function CapturePhotoScreen({
 );
   const employeeId =
     route?.params?.employeeId;
+  const mode =
+  route?.params?.mode;
+
+console.log(
+  'MODE',
+  mode
+);
 
   const employeeName =
     route?.params?.employeeName;
@@ -98,29 +112,74 @@ console.log(
   'EMBEDDING_GENERATED'
 );
 
-console.log(
-  'BEFORE_SAVE'
-);
+if (
+  mode === 'register'
+) {
 
-await saveEmployee({
-  employeeId,
-  employeeName,
-  registeredAt:
-    new Date().toISOString(),
-  photoWidth:
-    photo.width,
-  photoHeight:
-    photo.height,
-  embedding,
-});
+  console.log(
+    'BEFORE_SAVE'
+  );
 
-console.log(
-  'AFTER_SAVE'
-);
+  await saveEmployee({
+    employeeId,
+    employeeName,
+    registeredAt:
+      new Date().toISOString(),
+    photoWidth:
+      photo.width,
+    photoHeight:
+      photo.height,
+    embedding,
+  });
 
-setMessage(
-  'EMPLOYEE_REGISTERED ✓'
-);
+  console.log(
+    'AFTER_SAVE'
+  );
+
+  setMessage(
+    'EMPLOYEE_REGISTERED ✓'
+  );
+
+} else if (
+  mode === 'verify'
+) {
+
+  console.log(
+    'VERIFY_MODE'
+  );
+
+  const employee =
+    await getEmployeeById(
+      employeeId
+    );
+
+  if (!employee) {
+
+    setMessage(
+      'EMPLOYEE_NOT_FOUND'
+    );
+
+    return;
+  }
+
+  const score =
+    compareEmbeddings(
+      employee.embedding,
+      embedding
+    );
+
+  console.log(
+    'SIMILARITY',
+    score
+  );
+
+  setMessage(
+    score > 0.95
+      ? `VERIFIED ✓ ${score.toFixed(4)}`
+      : `FAILED ✗ ${score.toFixed(4)}`
+  );
+
+}
 
 /*
 await saveEmployee({
