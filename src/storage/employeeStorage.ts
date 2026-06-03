@@ -67,3 +67,10 @@ export async function getEmployeeById(
   );
 
 }
+export async function clearEmployees() {
+
+  await AsyncStorage.removeItem(
+    EMPLOYEE_KEY,
+  );
+
+}

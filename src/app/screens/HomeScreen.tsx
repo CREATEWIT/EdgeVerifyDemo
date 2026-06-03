@@ -3,6 +3,9 @@ import {
   loadFaceModel,
 } from '../../sdk/matching/loadModel';
 import {
+  syncEmployees,
+} from '../../sync/syncEmployees';
+import {
   View,
   Text,
   TouchableOpacity,
@@ -11,6 +14,7 @@ import {
 export default function
 HomeScreen({
   navigation,
+  
 }: any) {
   const [modelStatus,
 setModelStatus] =
@@ -124,6 +128,17 @@ setModelStatus(
     Run Model
   </Text>
 
+</TouchableOpacity>
+<TouchableOpacity
+  onPress={async () => {
+
+    await syncEmployees();
+
+  }}
+>
+  <Text>
+    Sync Employees
+  </Text>
 </TouchableOpacity>
    <Text>
   {modelStatus}
