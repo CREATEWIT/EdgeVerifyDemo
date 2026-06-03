@@ -49,6 +49,12 @@ console.log(
 
   const employeeName =
     route?.params?.employeeName;
+  const faceBounds =
+  route?.params?.faceBounds;
+console.log(
+  'CAPTURE_FACE_BOUNDS',
+  faceBounds
+);
 
   const device =
     useCameraDevice('front');
@@ -136,7 +142,8 @@ console.log(
 );
 const embedding =
   await generateEmbedding(
-    pixelBuffer
+    pixelBuffer,
+    faceBounds
   );
 
 console.log(

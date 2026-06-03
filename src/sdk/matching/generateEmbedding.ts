@@ -7,6 +7,7 @@ import { Images }
 export async function
 generateEmbedding(
   _pixelBuffer: ArrayBuffer,
+  faceBounds: any,
 ) {
 
   const image =
@@ -19,18 +20,70 @@ generateEmbedding(
         imageFormat: 'jpg',
       }
     );
+    console.log(
+  'FACE_BOUNDS_FOR_CROP',
+  faceBounds
+);
+  console.log(
+  'IMAGE_PROTO',
+  Object.getOwnPropertyNames(
+    Object.getPrototypeOf(image)
+  )
+);
 
   console.log(
     'IMAGE_LOADED',
     image.width,
     image.height
   );
+ const cropX =
+  Math.max(
+    0,
+    Math.round(faceBounds.x)
+  );
 
-  const resized =
-    image.resize(
-      112,
-      112
-    );
+const cropY =
+  Math.max(
+    0,
+    Math.round(faceBounds.y)
+  );
+
+const cropWidth =
+  Math.round(
+    faceBounds.width
+  );
+
+const cropHeight =
+  Math.round(
+    faceBounds.height
+  );
+
+console.log(
+  'CROP_VALUES',
+  cropX,
+  cropY,
+  cropWidth,
+  cropHeight
+);
+ const cropped =
+  await image.cropAsync(
+    cropX,
+    cropY,
+    cropWidth,
+    cropHeight
+  );
+
+console.log(
+  'IMAGE_CROPPED',
+  cropped.width,
+  cropped.height
+);
+
+const resized =
+  cropped.resize(
+    112,
+    112
+  );
 
   console.log(
     'IMAGE_RESIZED'

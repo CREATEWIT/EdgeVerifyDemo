@@ -22,6 +22,8 @@ export default function VerifyScreen({ route, navigation }: any) {
 
   const stepRef = useRef<LivenessStep>('BLINK');
   const photoCapturedRef = useRef(false);
+  const finalFaceBoundsRef =
+  useRef<any>(null);
   const verificationSavedRef = useRef(false);
 
   // Tracks when user first hit CENTER so we can enforce hold time
@@ -125,15 +127,16 @@ if (
   photoCapturedRef.current =
     true;
 
-  navigation.navigate(
-    'CapturePhoto',
-    {
-      mode: 'register',
-      employeeId,
-      employeeName,
-    }
-  );
-
+navigation.navigate(
+  'CapturePhoto',
+  {
+    mode: 'register',
+    employeeId,
+    employeeName,
+    faceBounds:
+      finalFaceBoundsRef.current,
+  }
+);
 }
       if (
   mode === 'verify' &&
@@ -143,13 +146,15 @@ if (
   photoCapturedRef.current =
     true;
 
-  navigation.navigate(
-    'CapturePhoto',
-    {
-      mode: 'verify',
-      employeeId,
-    }
-  );
+navigation.navigate(
+  'CapturePhoto',
+  {
+    mode: 'verify',
+    employeeId,
+    faceBounds:
+      finalFaceBoundsRef.current,
+  }
+);
 
 }
         break;
@@ -176,7 +181,9 @@ if (
     }
 
     const face = faces[0];
-
+    
+   finalFaceBoundsRef.current =
+  face.bounds;
     // ── FIX: bounds comes as { x, y, width, height } or as a flat object ──────
     // Try both shapes defensively
     const faceWidth: number =
