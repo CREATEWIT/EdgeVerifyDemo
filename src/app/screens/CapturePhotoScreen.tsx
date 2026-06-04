@@ -4,6 +4,8 @@ import {
   Text,
   StyleSheet,
 } from 'react-native';
+import NetInfo from
+'@react-native-community/netinfo';
 import {
   generateEmbedding,
 } from '../../sdk/matching/generateEmbedding';
@@ -177,6 +179,16 @@ if (
     'BEFORE_SAVE'
   );
 try {
+  const netState =
+  await NetInfo.fetch();
+
+const isOnline =
+  netState.isConnected === true;
+
+console.log(
+  'NETWORK_STATUS',
+  isOnline
+);
 
 await saveEmployee({
   employeeId,
@@ -190,10 +202,14 @@ await saveEmployee({
   embedding,
 
   networkMode:
-    'OFFLINE',
+  isOnline
+    ? 'ONLINE'
+    : 'OFFLINE',
 
-  syncStatus:
-    'PENDING_SYNC',
+syncStatus:
+  isOnline
+    ? 'SYNCED'
+    : 'PENDING_SYNC',
 });
 
   console.log(

@@ -1,7 +1,4 @@
-import React, { useState } from 'react';
-import {
-  loadFaceModel,
-} from '../../sdk/matching/loadModel';
+import React from 'react';
 import {
   syncEmployees,
 } from '../../sync/syncEmployees';
@@ -16,9 +13,6 @@ HomeScreen({
   navigation,
   
 }: any) {
-  const [modelStatus,
-setModelStatus] =
-  useState('');
 
   return (
 
@@ -63,72 +57,6 @@ setModelStatus] =
   Offline Sync Queue
 </Text>
       </TouchableOpacity>
-   <TouchableOpacity
-  onPress={async () => {
-
-    try {
-
-      setModelStatus(
-        'LOADING MODEL...'
-      );
-
-  const model =
-  await loadFaceModel();
-
-setModelStatus(
-  JSON.stringify(
-    {
-      inputs: model.inputs,
-      outputs: model.outputs,
-    },
-    null,
-    2
-  )
-);
-
-    } catch (error) {
-
-      setModelStatus(
-        'ERROR: ' +
-        String(error)
-      );
-
-    }
-
-  }}
->
-
-  <Text>
-    Load Model
-  </Text>
-
-</TouchableOpacity>
-<TouchableOpacity
-  onPress={async () => {
-
-    try {
-
-     setModelStatus(
-  'USE CAPTURE SCREEN'
-);
-
-    } catch (error) {
-
-      setModelStatus(
-        'ERROR: ' +
-        String(error)
-      );
-
-    }
-
-  }}
->
-
-  <Text>
-    Run Model
-  </Text>
-
-</TouchableOpacity>
 <TouchableOpacity
   onPress={async () => {
 
@@ -140,10 +68,6 @@ setModelStatus(
     Sync Employees
   </Text>
 </TouchableOpacity>
-   <Text>
-  {modelStatus}
-</Text>
-
     </View>
   );
 }
