@@ -52,7 +52,7 @@ EmployeeListScreen() {
           marginBottom: 20,
         }}
       >
-        Registered Employees
+        Employee List
       </Text>
 
       <FlatList
@@ -87,9 +87,29 @@ EmployeeListScreen() {
   Height:
   {item.photoHeight}
 </Text>
-        <Text>
-  Embedding Length:
-  {item.embedding?.length}
+<Text
+  style={{
+    marginTop: 10,
+    fontWeight: 'bold',
+    color:
+      item.networkMode === 'ONLINE'
+        ? 'green'
+        : 'orange',
+  }}
+>
+  Network: {item.networkMode}
+</Text>
+        <Text
+  style={{
+    marginTop: 10,
+    fontWeight: 'bold',
+    color:
+      item.syncStatus === 'SYNCED'
+        ? 'green'
+        : 'orange',
+  }}
+>
+  Status: {item.syncStatus}
 </Text>
           </View>
 

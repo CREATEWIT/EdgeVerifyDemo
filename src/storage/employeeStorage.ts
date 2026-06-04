@@ -9,6 +9,12 @@ export interface Employee {
   photoWidth: number;
   photoHeight: number;
   embedding: number[];
+
+  networkMode:
+    'ONLINE' | 'OFFLINE';
+
+  syncStatus:
+    'PENDING_SYNC' | 'SYNCED';
 }
 
 export async function saveEmployee(

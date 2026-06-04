@@ -34,9 +34,6 @@ import {
 export default function CapturePhotoScreen({
   route,
 }: any) {
-    console.log(
-  'CAPTURE_SCREEN_RENDERED'
-);
   const employeeId =
     route?.params?.employeeId;
   const mode =
@@ -75,31 +72,53 @@ console.log(
 
   return (
     <View style={styles.container}>
-
-      <Camera
+<Camera
   style={StyleSheet.absoluteFill}
   device={device}
   isActive={true}
   outputs={[photoOutput]}
-      />
+/>
+
+<View
+  style={styles.faceGuide}
+/>
 
       <View style={styles.overlay}
        pointerEvents="box-none"
       >
          <TouchableOpacity
   style={styles.button}
-  onPress={async () => {
+ onPress={async () => {
+
+  console.log(
+    'CAPTURE_BUTTON_PRESSED'
+  );
 
   setMessage(
     'CAPTURING...'
   );
 
- try {
+try {
+if (!faceBounds) {
+  setMessage(
+    'FACE_NOT_DETECTED'
+  );
+  return;
+}
+const startTime = Date.now();
+
 const photo =
   await photoOutput.capturePhoto(
     {},
     {}
   );
+  console.log(
+  'PHOTO_CAPTURED'
+);
+console.log(
+  'PHOTO_TIME',
+  Date.now() - startTime
+);
 
 console.log(
   'HAS_PIXEL_BUFFER',
@@ -108,47 +127,47 @@ console.log(
 
 const pixelBuffer =
   photo.getPixelBuffer();
+console.log(
+  'PIXEL_BUFFER_OBTAINED'
+);
 
 console.log(
   'PIXEL_BUFFER_BYTES',
   pixelBuffer.byteLength
 );
+let embedding;
 
-const bytes =
-  new Uint8Array(
-    pixelBuffer
+try {
+  const embeddingStart =
+  Date.now();
+  embedding =
+    await generateEmbedding(
+      pixelBuffer,
+      faceBounds
+    );
+
+  console.log(
+    'EMBEDDING_GENERATED'
+  );
+  console.log(
+  'EMBEDDING_TIME',
+  Date.now() - embeddingStart
+);
+
+} catch (e: any) {
+
+  console.log(
+    'EMBEDDING_ERROR',
+    e
   );
 
-console.log(
-  'FIRST_20_BYTES',
-  Array.from(
-    bytes.slice(0, 20)
-  )
-);
-
-console.log(
-  'PIXEL_BUFFER_TYPE',
-  typeof pixelBuffer
-);
-
-console.log(
-  'PIXEL_BUFFER_CONSTRUCTOR',
-  pixelBuffer?.constructor?.name
-);
-
-console.log(
-  'PIXEL_BUFFER_KEYS',
-  Object.keys(pixelBuffer || {})
-);
-const embedding =
-  await generateEmbedding(
-    pixelBuffer,
-    faceBounds
+  setMessage(
+    'EMBEDDING_FAILED'
   );
 
-console.log(
-  'EMBEDDING_GENERATED'
-);
+  return;
+}
+
 
 if (
   mode === 'register'
@@ -157,25 +176,44 @@ if (
   console.log(
     'BEFORE_SAVE'
   );
-console.log(
-  'PIXEL_BUFFER',
-  pixelBuffer
-);
-  await saveEmployee({
-    employeeId,
-    employeeName,
-    registeredAt:
-      new Date().toISOString(),
-    photoWidth:
-      photo.width,
-    photoHeight:
-      photo.height,
-    embedding,
-  });
+try {
+
+await saveEmployee({
+  employeeId,
+  employeeName,
+  registeredAt:
+    new Date().toISOString(),
+  photoWidth:
+    photo.width,
+  photoHeight:
+    photo.height,
+  embedding,
+
+  networkMode:
+    'OFFLINE',
+
+  syncStatus:
+    'PENDING_SYNC',
+});
 
   console.log(
     'AFTER_SAVE'
   );
+
+} catch (e: any) {
+
+  console.log(
+    'SAVE_EMPLOYEE_ERROR',
+    e
+  );
+
+  setMessage(
+    e?.message ??
+    'SAVE_FAILED'
+  );
+
+  return;
+}
 
   setMessage(
     'EMPLOYEE_REGISTERED ✓'
@@ -208,45 +246,37 @@ console.log(
       employee.embedding,
       embedding
     );
-
   console.log(
-    'SIMILARITY',
-    score
-  );
+  'FINAL_SCORE',
+  score
+);
 setMessage(
-  score > 0.90
-    ? `VERIFIED ✓ ${score.toFixed(4)}`
-    : `FAILED ✗ ${score.toFixed(4)}`
+  score > 0.80
+    ? `VERIFIED ✓ Score: ${score.toFixed(4)}`
+    : `VERIFICATION FAILED ✗ Score: ${score.toFixed(4)}`
 );
 
-}
-
-/*
-await saveEmployee({
-  employeeId,
-  employeeName,
-  registeredAt:
-    new Date().toISOString(),
-  photoWidth:
-    photo.width,
-  photoHeight:
-    photo.height,
-});
-
-setMessage(
-  'EMPLOYEE_REGISTERED ✓'
-);
-*/} catch (error) {
+}} catch (error: any) {
 
   console.log(
-    'SAVE_ERROR',
+    'FULL_ERROR',
     error
   );
 
-  setMessage(
-    String(error)
+  console.log(
+    'ERROR_MESSAGE',
+    error?.message
   );
 
+  console.log(
+    'ERROR_STACK',
+    error?.stack
+  );
+
+  setMessage(
+    error?.message ??
+    'CAPTURE_FAILED'
+  );
 }
 
 }
@@ -254,21 +284,12 @@ setMessage(
 }
 >
   <Text style={styles.buttonText}>
-    PRESS ME
-  </Text>
+  CAPTURE FACE
+</Text>
 </TouchableOpacity>
         <Text style={styles.title}>
           Capture Photo
         </Text>
-        <Text
-  style={{
-    color: 'yellow',
-    fontSize: 16,
-    marginBottom: 20,
-  }}
->
-  {message}
-</Text>
           <Text
   style={{color: 'yellow',fontSize: 20, }}
 >
@@ -330,6 +351,16 @@ const styles = StyleSheet.create({
 buttonText: {
   color: 'white',
   fontWeight: 'bold',
+},
+faceGuide: {
+  position: 'absolute',
+  width: 260,
+  height: 340,
+  borderWidth: 4,
+  borderColor: 'lime',
+  borderRadius: 170,
+  alignSelf: 'center',
+  top: '22%',
 },
 
 });

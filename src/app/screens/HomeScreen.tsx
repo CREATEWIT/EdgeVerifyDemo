@@ -60,8 +60,8 @@ setModelStatus] =
         }
       >
         <Text>
-          View Employees
-        </Text>
+  Offline Sync Queue
+</Text>
       </TouchableOpacity>
    <TouchableOpacity
   onPress={async () => {

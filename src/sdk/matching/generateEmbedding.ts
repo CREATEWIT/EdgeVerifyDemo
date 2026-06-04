@@ -36,34 +36,60 @@ generateEmbedding(
     image.width,
     image.height
   );
- const cropX =
+ const marginX =
+  Math.round(
+    faceBounds.width * 0.25
+  );
+
+const marginY =
+  Math.round(
+    faceBounds.height * 0.25
+  );
+
+const cropX =
   Math.max(
     0,
-    Math.round(faceBounds.x)
+    Math.round(
+      faceBounds.x - marginX
+    )
   );
 
 const cropY =
   Math.max(
     0,
-    Math.round(faceBounds.y)
+    Math.round(
+      faceBounds.y - marginY
+    )
   );
 
 const cropWidth =
-  Math.round(
-    faceBounds.width
+  Math.min(
+    image.width - cropX,
+    Math.round(
+      faceBounds.width +
+      marginX * 2
+    )
   );
 
 const cropHeight =
-  Math.round(
-    faceBounds.height
+  Math.min(
+    image.height - cropY,
+    Math.round(
+      faceBounds.height +
+      marginY * 2
+    )
   );
 
 console.log(
-  'CROP_VALUES',
-  cropX,
-  cropY,
-  cropWidth,
-  cropHeight
+  'MARGIN_CROP',
+  {
+    marginX,
+    marginY,
+    cropX,
+    cropY,
+    cropWidth,
+    cropHeight,
+  }
 );
 console.log(
   'IMAGE_SIZE',
@@ -146,18 +172,6 @@ const resized =
   new Uint8Array(
     raw.buffer
   );
-
-console.log(
-  'PIXEL_COUNT',
-  pixels.length
-);
-
-console.log(
-  'FIRST_16_PIXELS',
-  Array.from(
-    pixels.slice(0, 16)
-  )
-);
 
   console.log(
     'RAW_PIXEL_FORMAT',
