@@ -21,9 +21,13 @@ HomeScreen({
 
     <View>
 
-      <Text>
-        EdgeVerify SDK Demo
-      </Text>
+     <Text>
+  EdgeVerify
+</Text>
+
+<Text>
+  Offline Personnel Authentication
+</Text>
 
       <TouchableOpacity
         onPress={() =>
@@ -33,7 +37,7 @@ HomeScreen({
         }
       >
         <Text>
-          Start Verification
+          Verify Personnel
         </Text>
       </TouchableOpacity>
 
@@ -45,7 +49,7 @@ HomeScreen({
         }
       >
         <Text>
-          Register Employee
+          Register Personnel
         </Text>
       </TouchableOpacity>
 
@@ -57,7 +61,7 @@ HomeScreen({
         }
       >
         <Text>
-  Offline Sync Queue
+ Local Records Queue
 </Text>
       </TouchableOpacity>
 <TouchableOpacity
@@ -83,7 +87,7 @@ HomeScreen({
 }}
 >
   <Text>
-    Sync Employees
+    Sync & Purge
   </Text>
   <Text>
   {syncStatus}
