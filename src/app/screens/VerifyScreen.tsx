@@ -184,6 +184,7 @@ navigation.navigate(
     
    finalFaceBoundsRef.current =
   face.bounds;
+
     // ── FIX: bounds comes as { x, y, width, height } or as a flat object ──────
     // Try both shapes defensively
     const faceWidth: number =
@@ -202,18 +203,18 @@ navigation.navigate(
       console.log('LIVENESS_ERROR', err);
     });
 
-    setDebugInfo(
-      JSON.stringify({
-        step: stepRef.current,
-        leftEye: face.leftEyeOpenProbability?.toFixed(2),
-        rightEye: face.rightEyeOpenProbability?.toFixed(2),
-        smile: face.smilingProbability?.toFixed(2),
-        yaw: Math.round(face.yawAngle ?? 0),
-        pitch: Math.round(face.pitchAngle ?? 0),
-        roll: Math.round(face.rollAngle ?? 0),
-        faceWidth: Math.round(faceWidth),
-      }, null, 2)
-    );
+  setDebugInfo(
+  JSON.stringify({
+    step: stepRef.current,
+    leftEye: face.leftEyeOpenProbability?.toFixed(2),
+    rightEye: face.rightEyeOpenProbability?.toFixed(2),
+    smile: face.smilingProbability?.toFixed(2),
+    yaw: Math.round(face.yawAngle ?? 0),
+    pitch: Math.round(face.pitchAngle ?? 0),
+    roll: Math.round(face.rollAngle ?? 0),
+    faceWidth: Math.round(faceWidth),
+  }, null, 2)
+);
   }, [handleLivenessStep]);
 
   // ─── Render ────────────────────────────────────────────────────────────────────

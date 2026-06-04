@@ -65,19 +65,70 @@ console.log(
   cropWidth,
   cropHeight
 );
- const cropped =
-  await image.cropAsync(
+console.log(
+  'IMAGE_SIZE',
+  {
+    width: image.width,
+    height: image.height,
+  }
+);
+
+console.log(
+  'FACE_BOUNDS',
+  faceBounds
+);
+
+console.log(
+  'CROP_ARGS',
+  {
     cropX,
     cropY,
     cropWidth,
-    cropHeight
-  );
+    cropHeight,
+  }
+);
+
+let cropped;
+
+try {
 
 console.log(
-  'IMAGE_CROPPED',
-  cropped.width,
-  cropped.height
+  'FINAL_CROP_ARGS',
+  {
+    startX: cropX,
+    startY: cropY,
+    endX: cropX + cropWidth,
+    endY: cropY + cropHeight,
+  }
 );
+
+cropped =
+  await image.cropAsync(
+    cropX,
+    cropY,
+    cropX + cropWidth,
+    cropY + cropHeight
+  );
+  console.log(
+  'CROP_SUCCESS'
+);
+
+  console.log(
+    'IMAGE_CROPPED',
+    cropped.width,
+    cropped.height
+  );
+
+} catch (error) {
+
+  console.log(
+    'CROP_FAILED',
+    error
+  );
+
+  throw error;
+
+}
 
 const resized =
   cropped.resize(

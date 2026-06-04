@@ -213,12 +213,11 @@ console.log(
     'SIMILARITY',
     score
   );
-
-  setMessage(
-    score > 0.95
-      ? `VERIFIED ✓ ${score.toFixed(4)}`
-      : `FAILED ✗ ${score.toFixed(4)}`
-  );
+setMessage(
+  score > 0.90
+    ? `VERIFIED ✓ ${score.toFixed(4)}`
+    : `FAILED ✗ ${score.toFixed(4)}`
+);
 
 }
 
