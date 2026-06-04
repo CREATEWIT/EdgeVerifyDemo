@@ -28,13 +28,27 @@ EmployeeListScreen() {
   }, []);
 
   async function
-  loadEmployees() {
+loadEmployees() {
 
-    const data =
-      await getEmployees();
+  const data =
+    await getEmployees();
 
-    setEmployees(data);
-  }
+  setEmployees(data);
+}
+
+const pendingCount =
+  employees.filter(
+    e =>
+      e.syncStatus ===
+      'PENDING_SYNC'
+  ).length;
+
+const syncedCount =
+  employees.filter(
+    e =>
+      e.syncStatus ===
+      'SYNCED'
+  ).length;
 
   return (
 
@@ -54,6 +68,24 @@ EmployeeListScreen() {
       >
         Employee List
       </Text>
+      <Text
+  style={{
+    fontSize: 18,
+    color: 'orange',
+  }}
+>
+  Pending Sync: {pendingCount}
+</Text>
+
+<Text
+  style={{
+    fontSize: 18,
+    color: 'green',
+    marginBottom: 20,
+  }}
+>
+  Synced: {syncedCount}
+</Text>
 
       <FlatList
   data={employees}

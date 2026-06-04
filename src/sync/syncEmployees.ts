@@ -19,8 +19,16 @@ export async function syncEmployees() {
       employees.length
     );
 
+   await new Promise<void>(
+  resolve =>
+    setTimeout(
+      () => resolve(),
+      2000
+    )
+);
+
     console.log(
-      'SYNC_SUCCESS'
+      'SIMULATED_AWS_UPLOAD_SUCCESS'
     );
 
     await clearEmployees();
@@ -29,13 +37,21 @@ export async function syncEmployees() {
       'LOCAL_DATA_PURGED'
     );
 
+    return {
+      success: true,
+      uploaded:
+        employees.length,
+    };
+
   } catch (error) {
 
-    console.log(
-      'SYNC_FAILED',
-      error
-    );
+  console.log(
+    'SYNC_FAILED',
+    error
+  );
 
-  }
-
-}
+  return {
+    success: false,
+    uploaded: 0,
+  };
+  }}

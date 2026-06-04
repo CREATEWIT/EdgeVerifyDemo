@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   syncEmployees,
 } from '../../sync/syncEmployees';
@@ -8,11 +8,14 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
+
 export default function
 HomeScreen({
   navigation,
   
 }: any) {
+  const [syncStatus, setSyncStatus] =
+  useState('');
 
   return (
 
@@ -60,13 +63,31 @@ HomeScreen({
 <TouchableOpacity
   onPress={async () => {
 
+  const result =
     await syncEmployees();
 
-  }}
+  if (result?.success) {
+
+    setSyncStatus(
+      `Uploaded ${result.uploaded} employees`
+    );
+
+  } else {
+
+    setSyncStatus(
+      'SYNC FAILED'
+    );
+
+  }
+
+}}
 >
   <Text>
     Sync Employees
   </Text>
+  <Text>
+  {syncStatus}
+</Text>
 </TouchableOpacity>
     </View>
   );
