@@ -1,9 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-} from 'react-native';
+import {View,Text,StyleSheet,} from 'react-native';
 import { Camera } from 'react-native-vision-camera-face-detector';
 import { useCameraDevice} from 'react-native-vision-camera';
 import { saveVerification } from '../../storage/verificationStorage';
@@ -225,28 +221,13 @@ navigation.replace(
   const handleFacesDetected = useCallback((faces: any[]) => {
     setFaceCount(faces.length);
 
-   if (faces.length === 0) {
+ if (faces.length === 0) {
 
   setFaceCount(0);
 
-  setStatus('No Face');
-
-  if (stepRef.current !== 'BLINK') {
-  updateStep('BLINK');
-}
-
-  centerStartRef.current =
-    null;
-
-  rightStartRef.current =
-    null;
-
-  photoCapturedRef.current =
-    false;
-
-  verificationSavedRef.current =
-    false;
-
+  console.log(
+  'FACE_TEMPORARILY_LOST'
+);
   return;
 }
 

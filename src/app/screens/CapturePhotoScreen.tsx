@@ -1,37 +1,13 @@
 
-import {
-  View,
-  Text,
-  StyleSheet,
-} from 'react-native';
-import NetInfo from
-'@react-native-community/netinfo';
-import {
-  generateEmbedding,
-} from '../../sdk/matching/generateEmbedding';
-import {
-  getEmployeeById,
-} from '../../storage/employeeStorage';
-
-import {
-  compareEmbeddings,
-} from '../../sdk/matching/compareEmbeddings';
-
-import {
-  saveEmployee,
-} from '../../storage/employeeStorage';
-import React, {
-  useState,
-} from 'react';
-import {
-  Camera,
-  useCameraDevice,
-  usePhotoOutput,
-} from 'react-native-vision-camera';
-
-import {
-  TouchableOpacity,
-} from 'react-native';
+import {View,Text,StyleSheet,} from 'react-native';
+import NetInfo from '@react-native-community/netinfo';
+import {generateEmbedding,} from '../../sdk/matching/generateEmbedding';
+import {getEmployeeById,} from '../../storage/employeeStorage';
+import {compareEmbeddings,} from '../../sdk/matching/compareEmbeddings';
+import {saveEmployee,} from '../../storage/employeeStorage';
+import React, {useState,} from 'react';
+import {Camera,useCameraDevice,usePhotoOutput,} from 'react-native-vision-camera';
+import {TouchableOpacity,} from 'react-native';
 
 export default function CapturePhotoScreen({
   route,

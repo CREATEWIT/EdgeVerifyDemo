@@ -1,8 +1,5 @@
-import { Images }
-  from 'react-native-nitro-image';
-  import {
-  loadFaceModel,
-} from './loadModel';
+import { Images } from 'react-native-nitro-image';
+import {loadFaceModel,} from './loadModel';
 
 export async function
 generateEmbedding(

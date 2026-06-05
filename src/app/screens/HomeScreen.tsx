@@ -1,14 +1,6 @@
 import React, { useState } from 'react';
-import {
-  syncEmployees,
-} from '../../sync/syncEmployees';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-} from 'react-native';
-
-
+import {syncEmployees,} from '../../sync/syncEmployees';
+import {View,Text,TouchableOpacity,} from 'react-native';
 export default function
 HomeScreen({
   navigation,

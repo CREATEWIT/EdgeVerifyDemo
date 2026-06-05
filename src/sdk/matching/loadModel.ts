@@ -1,7 +1,4 @@
-import {
-  loadTensorflowModel,
-} from 'react-native-fast-tflite';
-
+import {loadTensorflowModel,} from 'react-native-fast-tflite';
 let cachedModel: any = null;
 
 export async function loadFaceModel() {

@@ -1,19 +1,6 @@
-import React, {
-  useEffect,
-  useState,
-} from 'react';
-
-import {
-  View,
-  Text,
-  FlatList,
-} from 'react-native';
-
-import {
-  getEmployees,
-  Employee,
-} from '../../storage/employeeStorage';
-
+import React, {useEffect,useState,} from 'react';
+import {View,Text,FlatList,} from 'react-native';
+import {getEmployees,Employee,} from '../../storage/employeeStorage';
 export default function
 EmployeeListScreen() {
 
